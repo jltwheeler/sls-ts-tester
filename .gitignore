@@ -1,5 +1,8 @@
 .env
 
+# Webpack
+.webpack/
+
 # compiled output
 /dist
 /node_modules
