@@ -5,7 +5,7 @@
   "main": "serverless.ts",
   "scripts": {
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "format": "prettier --write \"src/**/*.ts\"",
     "start:dev": "npx sls offline start",
     "hello": "npx sls invoke local -f hello --path src/functions/hello/mock.json"
   },
