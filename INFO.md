@@ -102,7 +102,7 @@ npm i -D husky lint-staged
 }
 ```
 
-6. Pre-commits should now be setup and ready to go 🔥
+6. Pre-commits should now be setup and ready to go next time you commit! 🔥
 
 ## Setup tests
 
