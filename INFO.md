@@ -75,15 +75,7 @@ module.exports = {
 }
 ```
 
-4. Install pre-commit dependencies
-
-```bash
-npm i -D husky lint-staged
-```
-
-> NB: `husky` must be `v6.0.0` or `v4.X.X` as version 5 is not MIT licensed!
-
-5. Create and setup `.huskyrc.json` and `.lintstagedrc` file configs
+4. Create and setup `.huskyrc.json` and `.lintstagedrc` file configs
    in the root directory.
 
 ```json
@@ -100,6 +92,17 @@ npm i -D husky lint-staged
 {
   "*.{js,ts}": ["npm run lint"]
 }
+```
+
+5. Install pre-commit dependencies and initialise the `.husky` pre-commit
+   directory and hook to call `lint-staged`.
+
+> NB: `husky` must be `v6.0.0` or `v4.X.X` as version 5 is not MIT licensed!
+
+```bash
+npm i -D husky lint-staged
+npx husky install
+npx husky add .husky/pre-commit "npx lint-staged"
 ```
 
 6. Pre-commits should now be setup and ready to go next time you commit
