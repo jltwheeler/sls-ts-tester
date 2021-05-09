@@ -1,7 +1,10 @@
 .env
 
-# Webpack
-.webpack/
+# Serverless directories
+.serverless
+
+# Webpack directories
+.webpack
 
 # compiled output
 /dist

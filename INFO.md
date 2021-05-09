@@ -1,6 +1,52 @@
 # Project Setup
 
-## Create Initial Boiler Plate
+Guide to setup a simple **serverless** Node.js project with TypeScript.
+
+This sample project consists of the following high-level architecture:
+
+- API Gateway to serve 1 Lambda function via a REST HTTP endpoint
+- SNS Topic to invoke 1 async Lambda function
+- Scheduled CloudWatch Cron Event to invoke 1 async Lambda function
+- DynamoDB for data store. `dynamodb-toolbox` and `aws-sdk` libs are used to
+  interact with DynamoDB
+- S3 to store long-term data that will be queried by Athena.
+
+<!-- TABLE OF CONTENTS -->
+
+<details open="open">
+  <summary>Table of Contents</summary>
+  <ol>
+    <li>
+      <a href="#initial-boiler-plate">Initial Boiler Plate</a>
+    </li>
+    <li>
+      <a href="#architecture">Architecture</a>
+    </li>
+    <li>
+      <a href="#typescript-config">TypeScript Config</a>
+    </li>
+    <li>
+      <a href="#linting-formatting-and-pre-commit-hooks">Linting, Formatting and Pre-commit hooks</a>
+    </li>
+    <li>
+      <a href="#testing">Testing</a>
+    </li>
+    <li>
+      <a href="#ci">CI</a>
+    </li>
+    <li>
+      <a href="#local-development">Local Development</a>
+        <ul>
+          <li><a href="#serverless-offline">Serverless Offline</a></li>
+          <li><a href="#dynamodb-local">DynamoDB Local</a></li>
+          <li><a href="#async-events">Async Events</a></li>
+      </ul>
+    </li>
+  </ol>
+</details>
+<br/>
+
+## Initial Boiler Plate
 
 Run the `serverless` create command and specify `aws-nodejs-typescript` as the
 inital starter template:
@@ -9,11 +55,25 @@ inital starter template:
 npx serverless create --template aws-nodejs-typescript --path sls-ts-tester
 ```
 
+## Architecture
+
+Describe project folder structure here...
+
 ## TypeScript Config
 
-Add `"strict": true` to the `tsconfig.json` file's `compilerOptions` object.
+Add `"strict": true` to the `tsconfig.json` file.
 
-## Setup Linting, Formatting and Pre-commit Hooks
+```json
+{
+  "compilerOptions": {
+    ...,
+    "strict": true,
+    ...
+  }
+}
+```
+
+## Linting, Formatting and Pre-commit hooks
 
 1. Install required dependencies and plugins for `prettier` and `eslint`.
 
@@ -75,8 +135,8 @@ module.exports = {
 }
 ```
 
-4. Create and setup `.huskyrc.json` and `.lintstagedrc` file configs
-   in the root directory.
+4. Create and setup `.huskyrc.json` and `.lintstagedrc` config files in the
+   root directory.
 
 ```json
 // .huskyrc.json
@@ -108,9 +168,48 @@ npx husky add .husky/pre-commit "npx lint-staged"
 6. Pre-commits should now be setup and ready to go next time you commit
    🔥 !!!
 
-## Setup tests
+## Testing
 
-## Setup CI
+1. Install testing dependencies. Using `jest` and the `ts-jest` plugin for
+   TypeScript support when running the `jest` test runner.
+
+```sh
+npm i -D jest ts-jest @types/jest
+```
+
+2. Setup `jest.config.js` file
+
+```js
+/* eslint-disable no-undef */
+module.exports = {
+  preset: 'ts-jest',
+  testPathIgnorePatterns: ['.webpack'],
+  moduleFileExtensions: ['js', 'json', 'ts'],
+  rootDir: 'src',
+  testRegex: '.*\\.test\\.ts$',
+  transform: {
+    '^.+\\.(t|j)s$': 'ts-jest',
+  },
+  collectCoverageFrom: ['**/*.(t|j)s'],
+  coverageDirectory: '../coverage',
+  testEnvironment: 'node',
+};
+```
+
+3. Add testing scripts to `package.json` file
+
+```json
+"scripts": {
+    ...
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage",
+    "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    ...
+}
+```
+
+## CI
 
 Create a `.github/workflows/push.yml` file. This `workflow` outlines the CI
 steps that will be run when pushing to branches other than `main`:
@@ -140,13 +239,12 @@ jobs:
         run: npm run test
 ```
 
-## Setup serverless-offline
+## Local Development
 
-`serverless-offline` is a community-made plugin for `serverless` framework that
-emulates `AWS Lambda` and `AWS API Gateway` on your local machine by spinning
-up a local HTTP server.
+### Serverless Offline
 
-### Steps
+To run a local development server use `serverless-offline`, a community-made plugin for the `serverless` framework that emulates `AWS Lambda` and
+`AWS API Gateway` on your local machine by spinning up a local HTTP server.
 
 1. Install the package:
 
@@ -164,10 +262,27 @@ plugins: ['serverless-webpack', 'serverless-offline'],
 
 ```json
 "scripts": {
+    ...
     "start:dev": "npx sls offline start",
+    ...
 },
 ```
 
-Now just run `npm run start:dev` to spin up the local HTTP server.
+4. Start the local HTTP sever:
 
-You can now hit the HTTP server using tools like `postman`.
+```bash
+npm run start:dev
+```
+
+5. Use tools like `postman` to test the server's endpoints
+
+### DynamoDB Local
+
+For local development, the `amazon/dynamodb-local` image is used to emulate
+AWS DynamoDB. To spin up the local dynamo server, follow the steps below:
+
+1. Run `docker-compose up -d` to start the container in a detatched state.
+2. Run `npm run db:migrate && npm run db:seed` to set up a local dynamodb for
+   development.
+
+### Async Events
