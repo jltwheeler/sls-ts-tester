@@ -12,6 +12,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "start:dev": "npx sls offline start --printOutput",
     "deploy": "sls deploy --aws-profile jltw-dev",
+    "destroy": "sls remove --aws-profile jltw-dev",
     "db:migrate": "npx ts-node src/scripts/dbMigrate.ts",
     "db:seed": "npx ts-node src/scripts/dbSeed.ts"
   },
