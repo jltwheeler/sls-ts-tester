@@ -2,6 +2,7 @@ import 'source-map-support/register';
 
 import { formatJSONResponse } from '@libs/apiGateway';
 import { middyfy } from '@libs/lambda';
+import { logger } from '@libs/logger';
 
 const payments = [
   { id: 1, amount: 300, createdAt: new Date(2021, 2, 1) },
@@ -9,16 +10,22 @@ const payments = [
 ];
 
 const getOnePayment = async (event: any) => {
-  const id = parseInt(event.pathParameters.id);
+  logger.debug(event, '/ request');
 
+  const id = parseInt(event.pathParameters.id);
   const payment = payments.find((payment) => payment.id === id);
 
   if (!payment) {
+    const message = `Error: payment id ${id} does not exist`;
+    logger.error(message);
     return formatJSONResponse({
-      data: `Error: payment id ${id} does not exist`,
+      data: message,
     });
   }
 
+  logger.info(payment, `Payment for id: ${id}`);
+
+  logger.debug(payment, '/ response');
   return formatJSONResponse({
     data: payment,
   });
