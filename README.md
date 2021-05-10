@@ -32,6 +32,9 @@ instructions on the framework, please refer to the
       <a href="#testing">Testing</a>
     </li>
     <li>
+      <a href="#logging">Logging</a>
+    </li
+    <li>
       <a href="#continuous-integration">Continuous Integration</a>
     </li>
     <li>
@@ -269,6 +272,20 @@ module.exports = {
     ...
 }
 ```
+
+## Logging
+
+Use the `pino` logging library for writing logs. `pino` is a modern, fast
+logging library with **very low** overhead. Given lambdas are billed per ms,
+it's critical that we use an efficient logging library. For more information,
+see [these benchmark results](https://github.com/pinojs/pino/blob/master/docs/benchmarks.md).
+
+Use production-ready and 'smart logging' concepts:
+
+- Log any meaningful information at each transaction start and end
+- Format log statements as JSON
+- Provide all the contextual properties (e.g. user id, operation type, etc)
+  so that the ops teams can act quicker.
 
 ## Continuous Integration
 
