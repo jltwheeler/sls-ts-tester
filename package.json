@@ -23,6 +23,7 @@
     "@middy/http-json-body-parser": "^1.5.2",
     "aws-sdk": "^2.902.0",
     "dynamodb-toolbox": "^0.3.3",
+    "pino": "^6.11.3",
     "source-map-support": "^0.5.19"
   },
   "devDependencies": {
