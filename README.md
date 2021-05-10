@@ -32,7 +32,7 @@ instructions on the framework, please refer to the
       <a href="#testing">Testing</a>
     </li>
     <li>
-      <a href="#ci">CI</a>
+      <a href="#continuous-integration">Continuous Integration</a>
     </li>
     <li>
       <a href="#local-development">Local Development</a>
@@ -75,21 +75,61 @@ divided into the directories below.:
 
 - `api` - containing code base and configuration for lambdas invoked by REST
   API endpoints
+- `jobs` - containing code base base and configuration for lambdas invoked by
+  async event triggers e.g. cron jobs and notifications
 - `libs` - containing shared code base between your lambdas
+- `models` - containing schema and entity definition for DynamoDB tables
+- `scripts` - containing one-off scripts to run project setup tasks such as
+  dynamodb migrations and seeds.
 
 > NB: Ensure any redundant files are deleted / modified from the initial
 > template bootstrapping.
 
 ## TypeScript Config
 
-Add `"strict": true` to the `tsconfig.json` file.
+Use a strict configuration. It is also recommended to build a
+`tsconfig.paths.json` to improve import readability in codebase.
 
 ```json
+// tsconfig.json
+{
+  "extends": "./tsconfig.paths.json",
+  "compilerOptions": {
+    "lib": ["ESNext"],
+    "moduleResolution": "node",
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "removeComments": true,
+    "sourceMap": true,
+    "target": "ES2020",
+    "outDir": "lib",
+    "strict": true
+  },
+  "include": ["src/**/*.ts", "serverless.ts"],
+  "exclude": [
+    "node_modules/**/*",
+    ".serverless/**/*",
+    ".webpack/**/*",
+    "_warmup/**/*",
+    ".vscode/**/*"
+  ],
+  "ts-node": {
+    "require": ["tsconfig-paths/register"]
+  }
+}
+```
+
+```json
+// tsconfig.paths.json
 {
   "compilerOptions": {
-    ...,
-    "strict": true,
-    ...
+    "baseUrl": ".",
+    "paths": {
+      "@api/*": ["src/api/*"],
+      "@jobs/*": ["src/jobs/*"],
+      "@models/*": ["src/models/*"],
+      "@libs/*": ["src/libs/*"]
+    }
   }
 }
 ```
@@ -125,7 +165,7 @@ module.exports = {
     node: true,
     jest: true,
   },
-  ignorePatterns: ['.eslintrc.js'],
+  ignorePatterns: ['.eslintrc.js', 'jest.config.js'],
   rules: {
     'prettier/prettier': ['error', { singleQuote: true }],
     '@typescript-eslint/interface-name-prefix': 'off',
@@ -151,8 +191,8 @@ module.exports = {
 
 ```json
 "scripts": {
-  "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
-  "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+  "lint": "eslint \"src/**/*.ts\" --fix",
+  "format": "prettier --write \"src/**/*.ts\"",
 }
 ```
 
@@ -230,7 +270,7 @@ module.exports = {
 }
 ```
 
-## CI
+## Continuous Integration
 
 Create a `.github/workflows/push.yml` file. This `workflow` outlines the CI
 steps that will be run when pushing to branches other than `main`:
@@ -304,6 +344,6 @@ AWS DynamoDB. To spin up the local dynamo server, follow the steps below:
 
 1. Run `docker-compose up -d` to start the container in a detatched state.
 2. Run `npm run db:migrate && npm run db:seed` to set up a local dynamodb for
-   development.
+   development. These scripts will create a table locally with some mock data.
 
 ### Async Events
